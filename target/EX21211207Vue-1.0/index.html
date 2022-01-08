@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="vuejs/vuejs-2.5.16.js"></script>
+<script src="vuejs/axios-0.18.0.js"></script>
+<body>
+<div id="TeacherTable">
+    名称<input type="text" v-model="teacherSibe.tname"/>
+    工资区间<input type="number" v-model="teacherSibe.tmoney"/>----
+    <input type="number" v-model="teacherSibe.money"/>
+    <button @click="getTeacherSelect()">搜索</button>
+<table border="1" rules="all">
+    <tr>
+        <th>老师编号</th>
+        <th>老师名称</th>
+        <th>老师年龄</th>
+        <th>老师性别</th>
+        <th>老师工资</th>
+        <th>操作</th>
+        <th>操作<button @click="addTeacher()">增加</button></th>
+    </tr>
+    <tr v-for="t in list">
+        <td>{{t.tid}}</td>
+        <td>{{t.tname}}</td>
+        <td>{{t.tage}}<span v-if="t.tage<18">未成年</span></td>
+        <td>{{t.tsex}}</td>
+        <td>{{t.tmoney}}</td>
+        <td><button @click="updateTeacher(t.tid)">修改</button></td>
+        <td><button @click="delTeacher(t.tid)">删除</button></td>
+    </tr>
+    <tr>
+        <td>当前{{pageNum}}页，总共{{page.lastPage}}页，总数量为{{page.total}}</td>
+        <td><button @click="on(1)">首页</button></td>
+        <td><button @click="on(page.prePage)">上一页</button></td>
+        <td><button @click="on(page.nextPage)">下一页</button></td>
+        <td><button @click="on(page.lastPage)">尾页</button></td>
+    </tr>
+</table>
+    <div id="addupdateDiv" style="display: none">
+        <table>
+            <tr>
+                <td>老师名称<input type="text" v-model="teacher.tname"></td>
+                <td>老师年龄<input type="number" v-model="teacher.tage"></td>
+                <td>老师性别<input type="text" v-model="teacher.tsex"></td>
+                <td>老师工资<input type="number" v-model="teacher.tmoney"></td>
+                <td><button @click="ctrl_s()">保存</button></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+<script>
+    var vm=new Vue({
+        el:'#TeacherTable',
+        data:{
+            pageNum:1,
+            pageSize:3,
+            list:[],
+            teacherSibe:{},
+            page:{},
+            teacher:{}
+        },
+        methods:{
+            ctrl_s(){
+                var _this=this;
+                axios.post('TeacherController/TeacherAddUpdate.do',_this.teacher).then(function (response) {
+                    if(response.data.goon){
+                        var adup=document.getElementById("addupdateDiv").style.display="none";
+
+                        _this.getTeacherSelect();
+                    }else{
+                        alert(response.data.uname);
+                    }
+                })
+            },
+            updateTeacher(tid){
+                document.getElementById("addupdateDiv").style.display="block";
+                var _this=this;
+                axios.post('TeacherController/TeacherById.do?tid='+tid).then(function (response) {
+                    _this.teacher=response.data;
+                })
+            },
+            addTeacher(){
+                teacher={};
+              var adup=document.getElementById("addupdateDiv").style.display="block";
+            },
+            delTeacher(tid){
+            var _this=this;
+
+              axios.post('TeacherController/TeacherDelete.do?tid='+tid).then(function (res) {
+                      if(res.data.goon){
+                          _this.getTeacherSelect();
+                      }else{
+                          alert(res.data.uname);
+                      }
+
+
+              })
+            },
+            getTeacherSelect:function() {
+                var _this=this;
+                var url='TeacherController/TeacherSelect.do?pageNum='+this.pageNum+'&pageSize='+this.pageSize;
+                axios.post(url,_this.teacherSibe).then(function (response) {
+                        _this.page=response.data;
+                        _this.list=response.data.list;
+                        _this.pageNum=response.data.pageNum;
+
+                })
+            },
+            on(pageNum) {
+                if(pageNum==0){
+                    pageNum=1;
+                }
+                this.pageNum=pageNum;
+                this.getTeacherSelect();
+            }
+        }
+    })
+    vm.getTeacherSelect();
+</script>
+</html>

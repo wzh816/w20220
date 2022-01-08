@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="angular.min.js"></script>
+<script src="myjs/base.js"></script>
+<script src="myjs/controller/angularController.js"></script>
+<script src="myjs/controller/ControllerUtils.js"></script>
+<script src="myjs/service/angularService.js"></script>
+
+<body ng-app="angular" ng-controller="indexController" ng-init="getTeacherSelect()">
+名称<input type="text" ng-model="teacherSibe.tname"/>
+工资区间<input type="number" ng-model="teacherSibe.tmoney"/>----
+<input type="number" ng-model="teacherSibe.money"/>
+<button ng-click="getTeacherSelect()">搜索</button>
+<table border="1" rules="all">
+    <tr style="color: palegreen">
+        <th>老师编号</th>
+        <th>老师名称</th>
+        <th>老师年龄</th>
+        <th>老师性别</th>
+        <th>老师工资</th>
+        <th>操作</th>
+        <th>操作<button ng-click="addTeacher()">增加</button></th>
+    </tr>
+    <tr ng-repeat="t in list">
+        <td>{{t.tid}}</td>
+        <td>{{t.tname}}</td>
+        <td>{{t.tage}}<span ng-if="t.tage<18">未成年</span></td>
+        <td>{{t.tsex}}</td>
+        <td>{{t.tmoney}}</td>
+        <td><button ng-click="deleteTeacher(t.tid)">删除</button></td>
+        <td><button ng-click="updateTeacher(t.tid)">修改</button></td>
+    </tr>
+    <tr>
+        <td>
+            当前{{pageNum}}页，总共{{page.lastPage}}页，总数量为{{page.total}}个
+            <button ng-click="on(1)">首页</button>
+            <button ng-click="on(page.prePage)">上一页</button>
+            <button ng-click="on(page.nextPage)">下一页</button>
+            <button ng-click="on(page.lastPage)">尾页</button>
+        </td>
+    </tr>
+</table>
+<div id="angularTablediv" style="display: none">
+    <table>
+        <tr>
+            <td>老师名称<input type="text" ng-model="teacher.tname"></td>
+            <td>老师年龄<input type="number" ng-model="teacher.tage"></td>
+            <td>老师性别<input type="text" ng-model="teacher.tsex"></td>
+            <td>老师工资<input type="number" ng-model="teacher.tmoney"></td>
+            <td><button ng-click="ctrl_s()">保存</button></td>
+        </tr>
+    </table>
+</div>
+</body>
+
+<!--<script>
+
+    app.controller('angularController',function ($scope,$http) {
+        $scope.list=[];
+        $scope.teacherSibe={};
+        $scope.teacher={};
+        $scope.page={};
+        $scope.pageNum=1;
+        $scope.pageSize=3;
+        $scope.getTeacherSelect=function () {
+            var url='TeacherController/TeacherSelect.do?pageNum='+$scope.pageNum+'&pageSize='+$scope.pageSize;
+            $http.post(url,$scope.teacherSibe).success(function (response) {
+                $scope.page=response;
+                $scope.list=response.list;
+                $scope.pageNum=response.pageNum;
+            })
+        },
+            $scope.on=function (pageNum) {
+                if(pageNum==0){
+                    pageNum=1;
+                }
+                $scope.pageNum=pageNum;
+                $scope.getTeacherSelect();
+            }
+        $scope.deleteTeacher=function (tid) {
+            $http.post('TeacherController/TeacherDelete.do?tid='+tid).success(function (response) {
+                if(response.goon){
+                    $scope.getTeacherSelect();
+                }else{
+                    alert($scope.uname);
+                }
+            })
+        }
+        $scope.addTeacher=function () {
+            $scope.teacher={};
+            document.getElementById("angularTablediv").style.display="block";
+        }
+        $scope.updateTeacher=function (tid) {
+            $http.post('TeacherController/TeacherById.do?tid='+tid).success(function (response) {
+                document.getElementById("angularTablediv").style.display="block";
+                $scope.teacher=response;
+            })
+        }
+        $scope.ctrl_s=function () {
+            $http.post('TeacherController/TeacherAddUpdate.do',$scope.teacher).success(function (response) {
+
+                if(response.goon){
+                    document.getElementById("angularTablediv").style.display="none";
+
+                    $scope.getTeacherSelect();
+                }else{
+                    alert($scope.uname);
+                }
+            })
+        }
+
+    })
+</script>-->
+</html>
